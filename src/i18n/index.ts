@@ -1,4 +1,5 @@
 import { en, type I18nKey } from "./en.js";
+import { de } from "./de.js";
 import { ru } from "./ru.js";
 import { zh } from "./zh.js";
 
@@ -15,6 +16,12 @@ const LOCALE_DEFINITIONS = [
     label: "English",
     dateLocale: "en-US",
     dictionary: en,
+  },
+  {
+    code: "de",
+    label: "Deutsch",
+    dateLocale: "de-DE",
+    dictionary: de,
   },
   {
     code: "ru",

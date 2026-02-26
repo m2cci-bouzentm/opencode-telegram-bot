@@ -95,7 +95,7 @@ describe("config boolean env parsing", () => {
   });
 
   it("falls back to default locale on unsupported value", async () => {
-    vi.stubEnv("BOT_LOCALE", "de");
+    vi.stubEnv("BOT_LOCALE", "fr");
 
     const config = await loadConfig();
 

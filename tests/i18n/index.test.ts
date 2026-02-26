@@ -20,17 +20,18 @@ describe("i18n/index locale helpers", () => {
     expect(resolveSupportedLocale("ru")).toBe("ru");
     expect(resolveSupportedLocale("ru-RU")).toBe("ru");
     expect(resolveSupportedLocale("en-US")).toBe("en");
-    expect(resolveSupportedLocale("de")).toBeNull();
+    expect(resolveSupportedLocale("de")).toBe("de");
   });
 
   it("normalizes unsupported locale values with fallback", () => {
-    expect(normalizeLocale("de", "en")).toBe("en");
+    expect(normalizeLocale("fr", "en")).toBe("en");
     expect(normalizeLocale(undefined, "ru")).toBe("ru");
   });
 
   it("returns date locale from locale definition", () => {
     expect(getDateLocale("ru")).toBe("ru-RU");
     expect(getDateLocale("en")).toBe("en-US");
+    expect(getDateLocale("de")).toBe("de-DE");
   });
 
   it("returns locale options from a single registry", () => {
