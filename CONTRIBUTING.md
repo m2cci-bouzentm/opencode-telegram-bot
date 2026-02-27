@@ -48,7 +48,7 @@ Sections are shown only when they contain at least one item.
 
 - `Major Changes`: `feat!` only
 - `Changes`: `feat`, `perf`
-- `Bug Fixes`: `fix`, `revert`
+- `Fixes`: `fix`, `revert`
 - `Technical`: `refactor`, `chore`, `ci`, `build`, `test`, `style`
 - `Documentation`: `docs`
 - `Other`: any subject that does not match the rules above

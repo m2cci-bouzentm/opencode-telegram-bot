@@ -6,7 +6,7 @@ import { writeFileSync } from "node:fs";
 const SECTION_ORDER = [
   "Major Changes",
   "Changes",
-  "Bug Fixes",
+  "Fixes",
   "Technical",
   "Documentation",
   "Other",
@@ -94,7 +94,7 @@ function classifyCommit(subject) {
   }
 
   if (type === "fix" || type === "revert") {
-    return { section: "Bug Fixes", text: description };
+    return { section: "Fixes", text: description };
   }
 
   if (TECHNICAL_TYPES.has(type)) {
