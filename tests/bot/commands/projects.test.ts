@@ -25,13 +25,13 @@ describe("bot/commands/projects", () => {
   describe("buildProjectButtonLabel", () => {
     it("formats label as index + folder + full path", () => {
       expect(buildProjectButtonLabel(0, "/Users/evan/work/opencode-telegram-bot")).toBe(
-        "1. [opencode-telegram-bot][/Users/evan/work/opencode-telegram-bot]",
+        "1. opencode-telegram-bot [/Users/evan/work/opencode-telegram-bot]",
       );
     });
 
     it("formats windows path label", () => {
       expect(buildProjectButtonLabel(3, "D:\\repo\\awesome")).toBe(
-        "4. [awesome][D:\\repo\\awesome]",
+        "4. awesome [D:\\repo\\awesome]",
       );
     });
   });

@@ -43,7 +43,7 @@ export function getProjectFolderName(worktree: string): string {
 
 export function buildProjectButtonLabel(index: number, worktree: string): string {
   const folderName = getProjectFolderName(worktree);
-  return `${index + 1}. [${folderName}][${worktree}]`;
+  return `${index + 1}. ${folderName} [${worktree}]`;
 }
 
 export async function projectsCommand(ctx: CommandContext<Context>) {
