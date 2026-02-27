@@ -32,7 +32,7 @@ Quick start: `npx @grinev/opencode-telegram-bot`
 - **Input flow control** — when an interactive flow is active, the bot accepts only relevant input to keep context consistent and avoid accidental actions
 - **Configurable reply formatting** — assistant replies use Telegram MarkdownV2 by default, with optional raw mode (`MESSAGE_FORMAT_MODE=markdown|raw`)
 - **Security** — strict user ID whitelist; no one else can access your bot, even if they find it
-- **Localization** — English, German, Spanish, Russian, and Simplified Chinese UI (`BOT_LOCALE=en|de|es|ru|zh`)
+- **Localization** — UI localization is supported for multiple languages (`BOT_LOCALE`)
 
 ## Prerequisites
 
@@ -52,7 +52,7 @@ You'll also need your **Telegram User ID** — send any message to [@userinfobot
 
 ### 2. Start OpenCode Server
 
-In your project directory, start the OpenCode server:
+Start the OpenCode server:
 
 ```bash
 opencode serve
