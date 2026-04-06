@@ -1,0 +1,18 @@
+[Unit]
+Description=OpenCode Serve API (Instance 2 - Iyed)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mohamed
+WorkingDirectory=/home/mohamed
+Environment="OPENCODE_PERMISSION={\"*\":\"allow\"}"
+ExecStart=/home/mohamed/.opencode/bin/opencode serve --port 4097
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

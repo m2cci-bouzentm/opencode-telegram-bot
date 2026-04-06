@@ -1,0 +1,19 @@
+[Unit]
+Description=grinev OpenCode Telegram Bot (Instance 2 - Iyed)
+After=network-online.target opencode-serve-2.service
+Wants=network-online.target
+Requires=opencode-serve-2.service
+
+[Service]
+Type=simple
+User=mohamed
+WorkingDirectory=/home/mohamed
+Environment=OPENCODE_TELEGRAM_HOME=/home/mohamed/.config/opencode-telegram-bot-2
+ExecStart=/usr/bin/opencode-telegram start
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
