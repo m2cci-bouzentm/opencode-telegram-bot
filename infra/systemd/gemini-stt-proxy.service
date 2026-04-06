@@ -1,0 +1,18 @@
+[Unit]
+Description=Gemini STT Proxy (Whisper-compatible)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mohamed
+WorkingDirectory=/home/mohamed/bot/engine
+ExecStart=/usr/bin/python3 /home/mohamed/bot/engine/gemini-stt-proxy.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/home/mohamed/bot/engine/.env
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

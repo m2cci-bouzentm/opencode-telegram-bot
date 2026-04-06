@@ -40,7 +40,7 @@ cp ../.env.example .env
 # 4. Install systemd services
 sudo cp systemd/*.service systemd/*.timer /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now opencode-serve opencode-telegram-bot ingest-memory.timer
+sudo systemctl enable --now opencode-serve opencode-telegram-bot ingest-memory.timer gemini-stt-proxy
 
 # 5. Add MCP memory server to OpenCode config
 # In ~/.config/opencode/opencode.json, add to "mcp":
@@ -53,3 +53,14 @@ sudo systemctl enable --now opencode-serve opencode-telegram-bot ingest-memory.t
 # 6. Install skills
 cp -r skills/linkedin-post-creator ~/.claude/skills/
 ```
+
+## Voice-to-Text (Gemini STT)
+
+Uses a local proxy that translates the Whisper-compatible API to Gemini.
+No Groq dependency — uses your existing `GEMINI_API_KEY`.
+
+```
+Voice → bot → http://127.0.0.1:8787/audio/transcriptions → Gemini 2.5 Flash → text
+```
+
+The proxy runs as `gemini-stt-proxy.service` and is shared by all bot instances.
