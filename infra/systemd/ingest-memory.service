@@ -1,0 +1,13 @@
+[Unit]
+Description=Ingest OpenCode sessions into vector memory
+
+[Service]
+Type=oneshot
+User=mohamed
+WorkingDirectory=/home/mohamed/bot/engine
+ExecStart=/home/mohamed/bot/engine/venv/bin/python3 -c "import sys; sys.path.insert(0,'/home/mohamed/bot/engine'); from memory_server import ingest_sessions, ingest_chat_log; print(ingest_sessions()); print(ingest_chat_log())"
+EnvironmentFile=/home/mohamed/bot/engine/.env
+Environment=EMBED_MODEL=BAAI/bge-large-en-v1.5
+Environment=EMBED_DEVICE=cuda
+Environment=MEMORY_PATH=/home/mohamed/bot/memory
+Environment=CHAT_LOG=/home/mohamed/bot/chat_history.jsonl

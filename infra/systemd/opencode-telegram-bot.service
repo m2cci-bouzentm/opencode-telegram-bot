@@ -1,0 +1,18 @@
+[Unit]
+Description=grinev OpenCode Telegram Bot
+After=network-online.target opencode-serve.service
+Wants=network-online.target
+Requires=opencode-serve.service
+
+[Service]
+Type=simple
+User=mohamed
+WorkingDirectory=/home/mohamed
+ExecStart=/usr/bin/opencode-telegram start
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
