@@ -2,8 +2,8 @@
 Description=Re-ingest OpenCode sessions every 3 hours
 
 [Timer]
-OnBootSec=2min
-OnUnitActiveSec=10min
+OnBootSec=1min
+OnUnitActiveSec=5min
 Persistent=true
 
 [Install]
