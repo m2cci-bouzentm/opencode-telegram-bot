@@ -66,6 +66,28 @@ export async function resolveProjectAgent(preferredAgent?: string): Promise<stri
     return requestedAgent;
   }
 
+  const caseMatch = agents.find(
+    (agent) => agent.name.toLowerCase() === requestedAgent.toLowerCase(),
+  );
+  if (caseMatch) {
+    logger.info(
+      `[AgentManager] Case-insensitive match: "${requestedAgent}" → "${caseMatch.name}"`,
+    );
+    setCurrentAgent(caseMatch.name);
+    return caseMatch.name;
+  }
+
+  const partialMatch = agents.find(
+    (agent) => agent.name.toLowerCase().startsWith(requestedAgent.toLowerCase()),
+  );
+  if (partialMatch) {
+    logger.info(
+      `[AgentManager] Partial match: "${requestedAgent}" → "${partialMatch.name}"`,
+    );
+    setCurrentAgent(partialMatch.name);
+    return partialMatch.name;
+  }
+
   const fallbackAgent = pickFallbackAgent(agents);
   logger.warn(
     `[AgentManager] Agent "${requestedAgent}" is not available for project ${project.worktree}. Falling back to "${fallbackAgent}".`,
