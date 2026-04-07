@@ -1,11 +1,13 @@
 [Unit]
-Description=Chromium Headless with Remote Debugging
-After=network-online.target
+Description=Chromium with Remote Debugging
+After=graphical-session.target
 
 [Service]
 Type=simple
 User=mohamed
-ExecStart=/usr/bin/chromium --headless --no-sandbox --disable-gpu --remote-debugging-port=9222 --user-data-dir=/home/mohamed/.cache/chromium-debug
+Environment=WAYLAND_DISPLAY=wayland-1
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStart=/usr/bin/chromium --remote-debugging-port=9222
 Restart=always
 RestartSec=5
 
