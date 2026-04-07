@@ -2,6 +2,7 @@
 Description=grinev OpenCode Telegram Bot
 After=network-online.target opencode-serve.service
 Wants=network-online.target
+Requires=opencode-serve.service
 
 [Service]
 Type=simple
