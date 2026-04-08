@@ -53,7 +53,9 @@ This uses:
 
 ### Step 3: Configure MCP to connect to it
 
-In `~/.config/opencode/opencode.json`:
+Two approaches — try A first, use B if A doesn't work.
+
+**Approach A: HTTP URL (simpler, stable across restarts)**
 
 ```json
 {
@@ -61,6 +63,48 @@ In `~/.config/opencode/opencode.json`:
     "chrome-devtools": {
       "type": "local",
       "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--browser-url=http://127.0.0.1:9222"]
+    }
+  }
+}
+```
+
+If the MCP ignores this and spawns its own browser, remove any competing Chrome binary (see Step 1) or use Approach B.
+
+**Approach B: WebSocket URL (forces direct connection)**
+
+First get the current websocket URL:
+```bash
+curl -s http://127.0.0.1:9222/json/version | python3 -c "import sys,json; print(json.load(sys.stdin)['webSocketDebuggerUrl'])"
+# Output: ws://127.0.0.1:9222/devtools/browser/<uuid>
+```
+
+Then use it:
+```json
+{
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--browser-ws-url=ws://127.0.0.1:9222/devtools/browser/<uuid>"]
+    }
+  }
+}
+```
+
+**Caveat**: The UUID changes every time Chromium restarts. You can automate this with a wrapper script:
+
+```bash
+#!/bin/bash
+WS_URL=$(curl -s http://127.0.0.1:9222/json/version | python3 -c "import sys,json; print(json.load(sys.stdin)['webSocketDebuggerUrl'])")
+exec npx -y chrome-devtools-mcp@latest --browser-ws-url="$WS_URL"
+```
+
+Save as `chrome-devtools-wrapper.sh`, then in config:
+```json
+{
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["/path/to/chrome-devtools-wrapper.sh"]
     }
   }
 }
