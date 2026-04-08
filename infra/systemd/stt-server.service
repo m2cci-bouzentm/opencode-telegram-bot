@@ -1,0 +1,15 @@
+[Unit]
+Description=STT Server (Parakeet/Gemini)
+After=network-online.target
+
+[Service]
+Type=simple
+User=mohamed
+WorkingDirectory=/home/mohamed/bot/engine
+ExecStart=/home/mohamed/bot/engine/venv/bin/python3 /home/mohamed/bot/engine/stt_server.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/home/mohamed/bot/engine/.env
+
+[Install]
+WantedBy=multi-user.target
