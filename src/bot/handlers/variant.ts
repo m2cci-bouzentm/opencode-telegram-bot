@@ -146,7 +146,7 @@ export async function buildVariantSelectionMenu(
   // Add button for each variant (one per row)
   activeVariants.forEach((variant) => {
     const isActive = variant.id === currentVariant;
-    const label = formatVariantForDisplay(variant.id);
+    const label = variant.label ? `💡 ${variant.label}` : formatVariantForDisplay(variant.id);
     const labelWithCheck = isActive ? `✅ ${label}` : label;
 
     keyboard.text(labelWithCheck, `variant:${variant.id}`).row();

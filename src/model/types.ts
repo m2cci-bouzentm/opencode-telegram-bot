@@ -11,6 +11,14 @@ export interface ModelInfo {
 export interface VariantInfo {
   id: string;
   disabled?: boolean;
+  label?: string;
+}
+
+export interface CatalogModel {
+  providerID: string;
+  modelID: string;
+  modelName?: string;
+  providerName?: string;
 }
 
 export interface FavoriteModel {

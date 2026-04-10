@@ -2,7 +2,7 @@ import { getCurrentModel, setCurrentModel } from "../settings/manager.js";
 import { config } from "../config.js";
 import { opencodeClient } from "../opencode/client.js";
 import { logger } from "../utils/logger.js";
-import type { ModelInfo, FavoriteModel, ModelSelectionLists } from "./types.js";
+import type { ModelInfo, FavoriteModel, ModelSelectionLists, CatalogModel } from "./types.js";
 import path from "node:path";
 
 interface OpenCodeModelState {
@@ -300,6 +300,46 @@ export function __resetModelCatalogCacheForTests(): void {
 export async function getFavoriteModels(): Promise<FavoriteModel[]> {
   const { favorites } = await getModelSelectionLists();
   return favorites;
+}
+
+/**
+ * Get all models exposed by the currently available OpenCode providers.
+ * This is the live authenticated/available catalog for this OpenCode instance.
+ */
+export async function getAvailableCatalogModels(): Promise<CatalogModel[]> {
+  try {
+    const response = await opencodeClient.config.providers();
+
+    if (response.error || !response.data) {
+      logger.warn("[ModelManager] Failed to fetch available catalog models:", response.error);
+      return [];
+    }
+
+    const all: CatalogModel[] = [];
+
+    for (const provider of response.data.providers) {
+      for (const model of Object.values(provider.models)) {
+        all.push({
+          providerID: provider.id,
+          modelID: model.id,
+          modelName: model.name,
+          providerName: provider.name,
+        });
+      }
+    }
+
+    all.sort((a, b) => {
+      const providerCompare = a.providerID.localeCompare(b.providerID);
+      if (providerCompare !== 0) return providerCompare;
+      return (a.modelName || a.modelID).localeCompare(b.modelName || b.modelID);
+    });
+
+    logger.debug(`[ModelManager] Loaded ${all.length} available catalog models`);
+    return all;
+  } catch (err) {
+    logger.error("[ModelManager] Error fetching available catalog models:", err);
+    return [];
+  }
 }
 
 /**

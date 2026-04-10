@@ -46,6 +46,9 @@ export async function getAvailableVariants(
         .map(([id, info]) => ({
           id,
           disabled: (info as { disabled?: boolean }).disabled,
+          label:
+            (info as { label?: string; effort?: string }).label ||
+            (info as { label?: string; effort?: string }).effort,
         }));
 
       variants.push(...apiVariants);

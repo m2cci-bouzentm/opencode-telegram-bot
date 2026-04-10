@@ -1,7 +1,12 @@
 import { Context, InlineKeyboard } from "grammy";
-import { selectModel, fetchCurrentModel, getModelSelectionLists } from "../../model/manager.js";
+import {
+  selectModel,
+  fetchCurrentModel,
+  getAvailableCatalogModels,
+  getModelSelectionLists,
+} from "../../model/manager.js";
 import { formatModelForDisplay } from "../../model/types.js";
-import type { FavoriteModel, ModelInfo, ModelSelectionLists } from "../../model/types.js";
+import type { CatalogModel, FavoriteModel, ModelInfo, ModelSelectionLists } from "../../model/types.js";
 import { formatVariantForButton } from "../../variant/manager.js";
 import { logger } from "../../utils/logger.js";
 import { createMainKeyboard } from "../utils/keyboard.js";
@@ -31,6 +36,15 @@ function buildModelSelectionMenuText(modelLists: ModelSelectionLists): string {
   return lines.join("\n");
 }
 
+const MODEL_PAGE_SIZE = 20;
+
+function buildCatalogMenuText(page: number, totalPages: number): string {
+  return `${t("model.menu.select")}
+
+Showing available models from the live OpenCode provider catalog.
+Page ${page + 1} / ${totalPages}`;
+}
+
 /**
  * Handle model selection callback
  * @param ctx grammY context
@@ -39,7 +53,7 @@ function buildModelSelectionMenuText(modelLists: ModelSelectionLists): string {
 export async function handleModelSelect(ctx: Context): Promise<boolean> {
   const callbackQuery = ctx.callbackQuery;
 
-  if (!callbackQuery?.data || !callbackQuery.data.startsWith("model:")) {
+  if (!callbackQuery?.data || (!callbackQuery.data.startsWith("model:") && !callbackQuery.data.startsWith("modelpage:"))) {
     return false;
   }
 
@@ -51,6 +65,19 @@ export async function handleModelSelect(ctx: Context): Promise<boolean> {
   logger.debug(`[ModelHandler] Received callback: ${callbackQuery.data}`);
 
   try {
+    if (callbackQuery.data.startsWith("modelpage:")) {
+      const page = Number.parseInt(callbackQuery.data.replace("modelpage:", ""), 10);
+      const currentModel = fetchCurrentModel();
+      const catalog = await getAvailableCatalogModels();
+      const totalPages = Math.max(1, Math.ceil(catalog.length / MODEL_PAGE_SIZE));
+      const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 0), totalPages - 1) : 0;
+      const keyboard = await buildModelSelectionMenu(currentModel, undefined, safePage, catalog);
+      const text = buildCatalogMenuText(safePage, totalPages);
+      await ctx.editMessageText(text, { reply_markup: keyboard }).catch(() => {});
+      await ctx.answerCallbackQuery().catch(() => {});
+      return true;
+    }
+
     if (ctx.chat) {
       keyboardManager.initialize(ctx.api, ctx.chat.id);
     }
@@ -133,8 +160,44 @@ export async function handleModelSelect(ctx: Context): Promise<boolean> {
 export async function buildModelSelectionMenu(
   currentModel?: ModelInfo,
   modelLists?: ModelSelectionLists,
+  page = 0,
+  catalogModels?: CatalogModel[],
 ): Promise<InlineKeyboard> {
   const keyboard = new InlineKeyboard();
+  const catalog = catalogModels ?? (await getAvailableCatalogModels());
+
+  if (catalog.length > 0) {
+    const totalPages = Math.max(1, Math.ceil(catalog.length / MODEL_PAGE_SIZE));
+    const safePage = Math.min(Math.max(page, 0), totalPages - 1);
+    const start = safePage * MODEL_PAGE_SIZE;
+    const items = catalog.slice(start, start + MODEL_PAGE_SIZE);
+
+    items.forEach((model) => {
+      const isActive =
+        currentModel &&
+        model.providerID === currentModel.providerID &&
+        model.modelID === currentModel.modelID;
+
+      const labelBase = model.modelName
+        ? `${model.providerID}/${model.modelName}`
+        : `${model.providerID}/${model.modelID}`;
+      const label = isActive ? `✅ ${labelBase}` : labelBase;
+      keyboard.text(label, `model:${model.providerID}:${model.modelID}`).row();
+    });
+
+    if (totalPages > 1) {
+      if (safePage > 0) {
+        keyboard.text("⬅️ Prev", `modelpage:${safePage - 1}`);
+      }
+      if (safePage < totalPages - 1) {
+        keyboard.text("Next ➡️", `modelpage:${safePage + 1}`);
+      }
+      keyboard.row();
+    }
+
+    return keyboard;
+  }
+
   const lists = modelLists ?? (await getModelSelectionLists());
   const favorites = lists.favorites;
   const recent = lists.recent;
@@ -170,15 +233,16 @@ export async function buildModelSelectionMenu(
 export async function showModelSelectionMenu(ctx: Context): Promise<void> {
   try {
     const currentModel = fetchCurrentModel();
-    const modelLists = await getModelSelectionLists();
-    const keyboard = await buildModelSelectionMenu(currentModel, modelLists);
+    const catalog = await getAvailableCatalogModels();
+    const totalPages = Math.max(1, Math.ceil(catalog.length / MODEL_PAGE_SIZE));
+    const keyboard = await buildModelSelectionMenu(currentModel, undefined, 0, catalog);
 
     if (keyboard.inline_keyboard.length === 0) {
       await ctx.reply(t("model.menu.empty"));
       return;
     }
 
-    const text = buildModelSelectionMenuText(modelLists);
+    const text = buildCatalogMenuText(0, totalPages);
 
     await replyWithInlineMenu(ctx, {
       menuKind: "model",
